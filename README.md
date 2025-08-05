@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Chat Demo - Rorie Marketing Expert
+
+A Next.js-based AI chat application featuring "Rorie", an AI assistant inspired by Rory Sutherland's marketing expertise and behavioral economics insights.
+
+## Features
+
+- **AI-Powered Chat Interface**: Real-time streaming chat with OpenRouter integration
+- **Personality-Driven AI**: Rorie channels Rory Sutherland's contrarian marketing wisdom
+- **Modern UI**: Clean, responsive design with dark theme and glassmorphism effects
+- **Copy Functionality**: Easy message copying with visual feedback
+- **Streaming Responses**: Real-time AI responses using Vercel AI SDK
+
+## Tech Stack
+
+- **Framework**: Next.js 15 with App Router
+- **AI Integration**: Vercel AI SDK with OpenRouter
+- **Styling**: Tailwind CSS
+- **Language**: TypeScript
+- **Deployment**: Vercel-ready
+
+## Environment Variables
+
+Create a `.env.local` file with the following variables:
+
+```env
+OPENROUTER_API_KEY=your_openrouter_api_key
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+OPENROUTER_MODEL=anthropic/claude-3.7-sonnet
+OPENROUTER_SITE_URL=your_site_url
+OPENROUTER_SITE_NAME=your_site_name
+```
 
 ## Getting Started
 
-First, run the development server:
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+2. **Set up environment variables**:
+   - Copy `.env.local.example` to `.env.local`
+   - Add your OpenRouter API key and configuration
+
+3. **Run the development server**:
+   ```bash
+   npm run dev
+   ```
+
+4. **Open your browser**:
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+## AI Personality
+
+Rorie is designed to embody Rory Sutherland's marketing philosophy:
+
+- **Contrarian Thinking**: Questions conventional wisdom and approaches problems from unexpected angles
+- **Behavioral Economics**: References cognitive biases and psychological insights
+- **Creative Solutions**: Focuses on perception, framing, and context over pure logic
+- **Engaging Communication**: Uses humor, analogies, and memorable examples
+
+## Project Structure
+
+```
+ai-chat/
+├── app/
+│   ├── api/chat/route.ts    # AI chat API endpoint
+│   ├── globals.css          # Global styles
+│   ├── layout.tsx           # Root layout
+│   └── page.tsx             # Chat interface
+├── public/                  # Static assets
+├── package.json             # Dependencies
+└── README.md               # This file
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deployment
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+This project is optimized for Vercel deployment:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Connect to Vercel**:
+   - Push to GitHub
+   - Import project in Vercel dashboard
 
-## Learn More
+2. **Configure environment variables**:
+   - Add all required environment variables in Vercel dashboard
 
-To learn more about Next.js, take a look at the following resources:
+3. **Deploy**:
+   - Vercel will automatically build and deploy
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Development
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **TypeScript**: Full type safety throughout the application
+- **ESLint**: Code quality and consistency
+- **Turbopack**: Fast development builds
+- **Hot Reload**: Instant feedback during development
 
-## Deploy on Vercel
+## Future Enhancements
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- [ ] Session persistence with Neon database
+- [ ] User authentication
+- [ ] Conversation history
+- [ ] Multiple AI personalities
+- [ ] File upload support
+- [ ] Voice input/output
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+## License
+
+MIT License - see LICENSE file for details.
