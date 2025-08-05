@@ -12,10 +12,13 @@
     "@ai-sdk/openai": "^2.0.2",
     "@ai-sdk/openai-compatible": "^1.0.1",
     "@ai-sdk/react": "^2.0.2",
+    "@prisma/client": "^6.13.0",
     "ai": "^5.0.2",
     "next": "15.4.5",
+    "prisma": "^6.13.0",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "zod": "^4.0.14"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

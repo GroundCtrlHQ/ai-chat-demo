@@ -53,11 +53,42 @@ function CopyButton({ parts }: { parts: Array<any> }) {
 
 export default function Chat() {
   const [input, setInput] = useState('');
+  const [limitInfo, setLimitInfo] = useState<{ limit: number; used: number } | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage, status, setMessages } = useChat({
     onError: (e) => console.error(e),
+    onFinish: () => {
+      // could refresh limit info if server sends it back in headers later
+    },
   });
+
+  // Monkey patch fetch used by useChat to capture 429 globally for this page.
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const res = await originalFetch(input, init);
+    // Only inspect our chat endpoint responses
+    try {
+      const url = typeof input === 'string' ? input : input.toString();
+      if (url.includes('/api/chat') && res.status === 429) {
+        const data = await res.clone().json().catch(() => null);
+        if (data && typeof data.limit === 'number') {
+          setLimitInfo({ limit: data.limit ?? 15, used: data.used ?? 15 });
+        } else {
+          setLimitInfo({ limit: 15, used: 15 });
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return res;
+  };
+
+  function handleClear() {
+    setMessages([]);
+    setLimitInfo(null);
+    // Soft clear; session server-side remains so counts persist by design.
+  }
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -67,8 +98,37 @@ export default function Chat() {
     <div className="min-h-screen bg-black text-white">
       <div className="mx-auto max-w-2xl px-4 pt-10 pb-32">
         <header className="mb-8">
-          <h1 className="text-2xl font-semibold tracking-tight">Rorie Marketing Expert</h1>
-          <p className="text-sm text-zinc-400">Powered by OpenRouter via Vercel AI SDK</p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-semibold tracking-tight">Rorie Marketing Expert</h1>
+              <p className="text-sm text-zinc-400">Powered by OpenRouter via Vercel AI SDK</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleClear}
+                className="rounded-md bg-white/10 hover:bg-white/15 active:bg-white/20 px-3 py-1.5 text-xs border border-white/10"
+                title="Clear local chat view (server session persists)"
+              >
+                Clear
+              </button>
+              <div
+                className="text-[11px] text-zinc-400 bg-white/5 border border-white/10 rounded-md px-2 py-1"
+                title="Limit: 15 messages per session. This is a free demo."
+                aria-label="Info: Limit 15 messages per session"
+              >
+                (i) Limit: 15 / session
+              </div>
+            </div>
+          </div>
+          {limitInfo && (
+            <div className="mt-3 text-[13px] text-amber-300">
+              You’ve reached the free demo limit ({limitInfo.used}/{limitInfo.limit}). Book a meeting to continue:{' '}
+              <a className="underline text-amber-200 hover:text-amber-100" href="https://groundctrl.space/book-a-meeting" target="_blank" rel="noreferrer">
+                https://groundctrl.space/book-a-meeting
+              </a>
+            </div>
+          )}
         </header>
 
         <div className="space-y-4">
@@ -110,6 +170,10 @@ export default function Chat() {
         onSubmit={e => {
           e.preventDefault();
           if (!input.trim()) return;
+          if (limitInfo) {
+            // prevent sending when limited
+            return;
+          }
           sendMessage({ role: 'user', parts: [{ type: 'text', text: input }] });
           setInput('');
         }}
@@ -121,20 +185,31 @@ export default function Chat() {
               <input
                 className="w-full bg-transparent outline-none text-zinc-100 placeholder:text-zinc-500 px-3 py-3"
                 value={input}
-                placeholder={status === 'streaming' ? 'Generating…' : 'Type a message…'}
+                placeholder={
+                  limitInfo
+                    ? 'Limit reached. Book a meeting to continue.'
+                    : status === 'streaming'
+                      ? 'Generating…'
+                      : 'Type a message…'
+                }
                 onChange={e => setInput(e.target.value)}
+                disabled={!!limitInfo}
               />
               <button
                 type="submit"
-                disabled={status === 'streaming'}
-                className="mx-2 rounded-lg bg-white/10 hover:bg-white/15 active:bg-white/20 px-4 py-2 text-sm text-white transition-colors border border-white/10"
+                disabled={status === 'streaming' || !!limitInfo}
+                className="mx-2 rounded-lg bg-white/10 hover:bg-white/15 active:bg-white/20 px-4 py-2 text-sm text-white transition-colors border border-white/10 disabled:opacity-50"
+                title={limitInfo ? 'Message limit reached' : 'Send message'}
               >
                 Send
               </button>
             </div>
           </div>
           <p className="mt-2 text-center text-[11px] text-zinc-500">
-            This is a simple agent. Memory and session storage with Neon will be added next.
+            Free demo with limit of 15 messages per session. When reached, please{' '}
+            <a className="underline text-zinc-300" href="https://groundctrl.space/book-a-meeting" target="_blank" rel="noreferrer">
+              book a meeting
+            </a>.
           </p>
         </div>
       </form>
