@@ -95,8 +95,20 @@ export default function Chat() {
   }, [messages.length]);
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="mx-auto max-w-2xl px-4 pt-10 pb-32">
+    <div className="min-h-screen w-full bg-[#0a0a0a] relative text-zinc-100">
+      {/* Diagonal Grid with Light (dark-mode tuned) */}
+      <div
+        className="absolute inset-0 z-0 pointer-events-none"
+        style={{
+          backgroundImage: `
+            repeating-linear-gradient(45deg, rgba(255,255,255,0.06) 0, rgba(255,255,255,0.06) 1px, transparent 1px, transparent 20px),
+            repeating-linear-gradient(-45deg, rgba(255,255,255,0.06) 0, rgba(255,255,255,0.06) 1px, transparent 1px, transparent 20px)
+          `,
+          backgroundSize: '40px 40px',
+        }}
+        aria-hidden="true"
+      />
+      <div className="relative z-10 mx-auto max-w-2xl px-4 pt-10 pb-32">
         <header className="mb-8">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -144,7 +156,6 @@ export default function Chat() {
                   <div className="text-xs uppercase tracking-wide text-zinc-400">
                     {m.role === 'user' ? 'You' : 'Rorie'}
                   </div>
-                  <CopyButton parts={m.parts} />
                 </div>
                 {m.parts.map((part, i) => {
                   if (part.type === 'text') {
@@ -159,6 +170,9 @@ export default function Chat() {
                   }
                   return null;
                 })}
+                <div className="mt-2 flex justify-end">
+                  <CopyButton parts={m.parts} />
+                </div>
               </div>
             </div>
           ))}
@@ -179,7 +193,7 @@ export default function Chat() {
         }}
         className="fixed inset-x-0 bottom-0 z-10"
       >
-        <div className="mx-auto max-w-2xl px-4 pb-6">
+        <div className="relative z-10 mx-auto max-w-2xl px-4 pb-6">
           <div className="backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-white/3 rounded-2xl border border-white/10 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),0_10px_30px_rgba(0,0,0,0.35)]">
             <div className="flex items-center gap-2 p-2">
               <input

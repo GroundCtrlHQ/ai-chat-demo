@@ -1,114 +1,124 @@
-# AI Chat Demo - Rorie Marketing Expert
+# GroundCtrl AI Chat – “Rorie” Marketing Expert
 
-A Next.js-based AI chat application featuring "Rorie", an AI assistant inspired by Rory Sutherland's marketing expertise and behavioral economics insights.
+A production-ready Next.js AI chat experience featuring “Rorie”, an assistant inspired by Rory Sutherland’s contrarian marketing mindset. It uses the Vercel AI SDK with OpenRouter for responses, and Neon (Postgres) via Prisma for per-session memory and rate limiting.
 
-## Features
+Live UX highlights:
+- Dark-mode UI with subtle diagonal grid background
+- Real-time streaming responses
+- Copy-to-clipboard per message (bottom-right)
+- Clear button to reset local view
+- Free demo limit with CTA to book a meeting
 
-- **AI-Powered Chat Interface**: Real-time streaming chat with OpenRouter integration
-- **Personality-Driven AI**: Rorie channels Rory Sutherland's contrarian marketing wisdom
-- **Modern UI**: Clean, responsive design with dark theme and glassmorphism effects
-- **Copy Functionality**: Easy message copying with visual feedback
-- **Streaming Responses**: Real-time AI responses using Vercel AI SDK
+Useful links:
+- GroundCtrl site: https://groundctrl.space/
+- Book a meeting: https://groundctrl.space/book-a-meeting
 
-## Tech Stack
+## What this project does
 
-- **Framework**: Next.js 15 with App Router
-- **AI Integration**: Vercel AI SDK with OpenRouter
-- **Styling**: Tailwind CSS
-- **Language**: TypeScript
-- **Deployment**: Vercel-ready
+- AI chat with strong “Rorie” persona and prompt guardrails
+- Session-based memory:
+  - Anonymous cookie session (gc_session_id) identifies the browser session
+  - User and assistant messages are stored in Neon (Postgres) for that session
+  - On each turn, recent history is included to give the model continuity
+- Simple rate limiting:
+  - 15 user messages per session by default
+  - On limit, API returns 429 and UI surfaces a CTA linking to “Book a meeting”
+- Developer visibility:
+  - Prisma Studio exposed locally to inspect ChatSession, Message, and SessionLimit tables
 
-## Environment Variables
+## Tech stack
 
-Create a `.env.local` file with the following variables:
+- Framework: Next.js 15 (App Router, TypeScript)
+- AI: Vercel AI SDK with OpenRouter provider
+- DB: Neon Postgres + Prisma ORM
+- UI: Tailwind CSS
+- Dev: Turbopack, ESLint
 
-```env
-OPENROUTER_API_KEY=your_openrouter_api_key
-OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
-OPENROUTER_MODEL=anthropic/claude-3.7-sonnet
-OPENROUTER_SITE_URL=your_site_url
-OPENROUTER_SITE_NAME=your_site_name
-```
-
-## Getting Started
-
-1. **Install dependencies**:
-   ```bash
-   npm install
-   ```
-
-2. **Set up environment variables**:
-   - Copy `.env.local.example` to `.env.local`
-   - Add your OpenRouter API key and configuration
-
-3. **Run the development server**:
-   ```bash
-   npm run dev
-   ```
-
-4. **Open your browser**:
-   Navigate to [http://localhost:3000](http://localhost:3000)
-
-## AI Personality
-
-Rorie is designed to embody Rory Sutherland's marketing philosophy:
-
-- **Contrarian Thinking**: Questions conventional wisdom and approaches problems from unexpected angles
-- **Behavioral Economics**: References cognitive biases and psychological insights
-- **Creative Solutions**: Focuses on perception, framing, and context over pure logic
-- **Engaging Communication**: Uses humor, analogies, and memorable examples
-
-## Project Structure
+## Repository structure
 
 ```
 ai-chat/
-├── app/
-│   ├── api/chat/route.ts    # AI chat API endpoint
-│   ├── globals.css          # Global styles
-│   ├── layout.tsx           # Root layout
-│   └── page.tsx             # Chat interface
-├── public/                  # Static assets
-├── package.json             # Dependencies
-└── README.md               # This file
+├─ app/
+│  ├─ api/chat/route.ts   # Chat API: sessions, memory, rate limit, streaming
+│  ├─ layout.tsx          # Root layout
+│  ├─ page.tsx            # Chat UI (dark-mode grid, copy button, limit notice)
+│  └─ globals.css         # Global styles
+├─ lib/
+│  ├─ db.ts               # Prisma client singleton
+│  └─ session.ts          # Cookie-based session id
+├─ prisma/
+│  ├─ schema.prisma       # ChatSession, Message, SessionLimit
+│  └─ migrations/         # Applied migrations
+└─ src/generated/prisma/  # Prisma client output
 ```
 
-## Deployment
+## Environment configuration
 
-This project is optimized for Vercel deployment:
+Create `.env` (or `.env.local`) with:
 
-1. **Connect to Vercel**:
-   - Push to GitHub
-   - Import project in Vercel dashboard
+```env
+# OpenRouter
+OPENROUTER_API_KEY=your_openrouter_api_key
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+OPENROUTER_MODEL=z-ai/glm-4.5-air:free
+# Optional identification
+# OPENROUTER_SITE_URL=
+# OPENROUTER_SITE_NAME=
 
-2. **Configure environment variables**:
-   - Add all required environment variables in Vercel dashboard
+# Neon
+DATABASE_URL=postgres://<user>:<pass>@<host>/<db>?sslmode=require
+DATABASE_URL_UNPOOLED=postgresql://<user>:<pass>@<host>/<db>?sslmode=require
 
-3. **Deploy**:
-   - Vercel will automatically build and deploy
+# Demo session limit (default 15 if unset)
+SESSION_MESSAGE_LIMIT=15
+```
 
-## Development
+Note: In this repository we also generate a Prisma client to `src/generated/prisma` (configured in `prisma/schema.prisma`).
 
-- **TypeScript**: Full type safety throughout the application
-- **ESLint**: Code quality and consistency
-- **Turbopack**: Fast development builds
-- **Hot Reload**: Instant feedback during development
+## Local development
 
-## Future Enhancements
+1) Install dependencies
+```bash
+pnpm install
+```
 
-- [ ] Session persistence with Neon database
-- [ ] User authentication
-- [ ] Conversation history
-- [ ] Multiple AI personalities
-- [ ] File upload support
-- [ ] Voice input/output
+2) Generate Prisma client and apply migrations
+```bash
+pnpm approve-builds @prisma/client @prisma/engines prisma   # approve postinstall for prisma if prompted
+pnpm prisma generate
+pnpm prisma migrate dev --name init_chat_sessions
+```
 
-## Contributing
+3) Run dev server and Prisma Studio
+```bash
+SESSION_MESSAGE_LIMIT=15 pnpm dev
+pnpm prisma studio -- --port 5555
+```
+- App: http://localhost:3000
+- Prisma Studio: http://localhost:5555
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
+## Using this project (for others)
 
-## License
+- Fork/clone the repository
+- Create your `.env` with OpenRouter and Neon credentials
+- Run the steps above to migrate and start
+- Optionally tweak:
+  - Rate limit: set `SESSION_MESSAGE_LIMIT`
+  - Context window: in `app/api/chat/route.ts`, adjust how many past messages are loaded
+  - Persona & prompt: edit the `system` text in the same API route
 
-MIT License - see LICENSE file for details.
+## Production notes
+
+- Deploy on Vercel and configure environment variables in the dashboard
+- Neon is serverless; ensure the `DATABASE_URL` uses SSL and (optionally) the pooler endpoint for scale
+- For longer conversations, consider:
+  - Summarization of older turns
+  - Increasing message load cap
+  - Authentication to give higher limits to trusted users
+
+## Credits and contact
+
+- Built by GroundCtrl. Learn more: https://groundctrl.space/
+- Book a meeting: https://groundctrl.space/book-a-meeting
+
+MIT License.
