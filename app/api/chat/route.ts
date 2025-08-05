@@ -1,6 +1,5 @@
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { streamText, convertToModelMessages, type UIMessage } from 'ai';
-import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { getOrCreateSessionId } from '@/lib/session';
 
@@ -67,7 +66,7 @@ export async function POST(req: Request) {
       data: {
         role: 'user',
         content: (lastUser.parts ?? [])
-          .map((p: any) => (p?.type === 'text' ? p.text : ''))
+          .map((p: { type?: string; text?: string }) => (p?.type === 'text' ? p.text : ''))
           .join('\n')
           .trim(),
         chatSession: { connect: { sessionId: sid } },

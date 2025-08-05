@@ -20,12 +20,12 @@ function CheckIcon() {
   );
 }
 
-function CopyButton({ parts }: { parts: Array<any> }) {
+function CopyButton({ parts }: { parts: Array<{ type?: string; text?: string }> }) {
   const [copied, setCopied] = useState(false);
 
   const onCopy = async () => {
     const text = parts
-      .map((p: any) => (p?.type === 'text' ? p.text : ''))
+      .map((p: { type?: string; text?: string }) => (p?.type === 'text' ? p.text : ''))
       .join('\n')
       .trim();
     if (!text) return;
